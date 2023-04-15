@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import app from '../firebase/firebase.config';
+
+const auth = getAuth(app);
 
 const Register = () => {
     const [email, setEmail] = useState('');
@@ -13,6 +17,15 @@ const Register = () => {
         const email = event.target.email.value;
         const password = event.target.password.value;
         console.log(email, password)
+
+        createUserWithEmailAndPassword(auth, email, password)
+        .then(result => {
+            const logUser = result.user;
+            console.log(logUser);
+        })
+        .catch(error => {
+            console.log(error);
+        })
     }
 
     const handlePasswordBlur = (event) => {
