@@ -5,26 +5,48 @@ import app from '../firebase/firebase.config';
 const auth = getAuth(app);
 
 const Register = () => {
-    const [email, setEmail] = useState('');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     const handleEmailChange = (event) => {
         // console.log(event.target.value)
-        setEmail(event.target.value);
+        // setEmail(event.target.value);
     }
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        setSuccess('');
+        setError('');
         const email = event.target.email.value;
         const password = event.target.password.value;
         console.log(email, password)
+
+
+        // validate
+        if(!/(?=.*[A-Z])/.test(password)){
+            setError('Please add at least one uppercase');
+            return;
+        }
+        else if(!/(?=.*[0-9].*[0-9.])/.test(password)){
+            setError('please add at least two numbers');
+            return;
+        }
+        else if (password.length<6){
+            setError('please add at least 6 characters in your password')
+            return;
+        }
 
         createUserWithEmailAndPassword(auth, email, password)
         .then(result => {
             const logUser = result.user;
             console.log(logUser);
+            setError('');
+            event.target.reset();
+            setSuccess('User has create succesfully')
         })
         .catch(error => {
-            console.log(error);
+            console.log(error.message);
+            setError(error.message)
         })
     }
 
@@ -40,13 +62,17 @@ const Register = () => {
             <form className='w-80 mx-auto' onSubmit={handleSubmit}>
                 <input onChange={handleEmailChange} className='mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
                 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
-                disabled:bg-slate-50' type="email" name='email' placeholder='Your Email' />
+                disabled:bg-slate-50' type="email" name='email' placeholder='Your Email' required/>
                 
                 <input className='mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
                 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
-                disabled:bg-slate-50' type="password" name='password' id='password' placeholder='Your password' />
+                disabled:bg-slate-50' type="password" name='password' id='password' placeholder='Your password' required/>
                 {/* <input className='bg-blue-600 mt-5 text-white rounded-xl px-5 py-3' type="submit" value="Register" /> */}
 
+                <div className='text-center mt-4'>
+                    <p className='text-lg font-medium text-red-900'>{error.slice(10, 50)}</p>
+                    <p className='text-lg font-medium text-green-800'>{success}</p>
+                </div>
 
                 <div className="flex justify-start">
                                 <label className="text-gray-500 font-bold my-4 flex items-center">
