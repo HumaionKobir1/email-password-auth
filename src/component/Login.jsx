@@ -1,4 +1,10 @@
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import app from '../firebase/firebase.config';
+
+const auth = getAuth(app);
 
 const Login = () => {
     const [error, setError] = useState('');
@@ -7,6 +13,8 @@ const Login = () => {
 
     const handleLogin = event => {
         event.preventDefault();
+        setSuccess('');
+        setError('');
         const form = event.target;
         const email = form.email.value;
         const password = form.password.value;
@@ -23,13 +31,31 @@ const Login = () => {
             setError('Please add a special character');
             return;
         }
+
+        signInWithEmailAndPassword(auth, email, password)
+        .then(result => {
+            const loggedUser = result.user;
+            console.log(loggedUser)
+
+            
+
+            setSuccess('User login success')
+            setError('');
+        })
+        .catch(error => {
+            setError(error.message)
+            console.log(error)
+        })
     }
+
+    
+
 
 
     return (
-        <div className='mx-auto w-1/4 bg-white rounded-lg shadow-md p-8 mt-10'>
-
-            <form onSubmit={handleLogin} className="w-full max-w-sm mx-auto">
+        <div className='mx-auto md:w-2/4 bg-white rounded-lg shadow-md p-8 mt-10'>
+            <h1 className='text-2xl font-semibold text-center'>Please Login</h1>
+            <form onSubmit={handleLogin} className="w-full max-w-sm mx-auto mt-10">
                 <div className="mb-4">
                     <label htmlFor="email" className="block text-gray-700 font-bold mb-2">Email</label>
                     <input type="email" name='email' id="email" placeholder="Enter your email" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required/>
@@ -51,6 +77,9 @@ const Login = () => {
                     </a>
                 </div>
             </form>
+            <div className='mt-4'>
+                <p>New to this website? Please <Link to='/register' className='text-blue-500 hover:text-blue-800'>Register</Link></p>
+            </div>
 
         </div>
     );
